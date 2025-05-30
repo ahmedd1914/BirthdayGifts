@@ -1,0 +1,139 @@
+@model BirthdayGifts.Web.Models.ViewModels.Voting.VotingSessionViewModel
+@{
+    ViewData["Title"] = "Voting Session Details";
+}
+
+<div class="container">
+    <h2>@ViewData["Title"]</h2>
+    <hr />
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Session Information</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Birthday Person</dt>
+                        <dd class="col-sm-8">@Model.BirthdayPersonName</dd>
+                        <dt class="col-sm-4">Creator</dt>
+                        <dd class="col-sm-8">@Model.CreatorName</dd>
+                        <dt class="col-sm-4">Status</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Ended</span>
+                            }
+                        </dd>
+                        <dt class="col-sm-4">Started</dt>
+                        <dd class="col-sm-8">@Model.StartedAt.ToString("g")</dd>
+                        <dt class="col-sm-4">Ended</dt>
+                        <dd class="col-sm-8">@(Model.EndedAt?.ToString("g") ?? "Still Active")</dd>
+                        <dt class="col-sm-4">Total Votes</dt>
+                        <dd class="col-sm-8">@Model.TotalVotes</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Voting Results</h5>
+                    <a asp-action="Results" asp-route-id="@Model.VotingSessionId" class="btn btn-primary btn-sm">
+                        View Detailed Results
+                    </a>
+                </div>
+                <div class="card-body">
+                    @if (Model.VoteResults.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Gift</th>
+                                        <th>Votes</th>
+                                        <th>Percentage</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var result in Model.VoteResults)
+                                    {
+                                        <tr>
+                                            <td>@result.GiftName</td>
+                                            <td>@result.VoteCount</td>
+                                            <td>
+                                                <div class="progress">
+                                                    <div class="progress-bar" role="progressbar" 
+                                                         style="width: @result.Percentage%;" 
+                                                         aria-valuenow="@result.Percentage" 
+                                                         aria-valuemin="0" 
+                                                         aria-valuemax="100">
+                                                        @result.Percentage.ToString("F1")%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No votes have been cast yet.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col">
+            <a asp-action="Index" class="btn btn-secondary">Back to Sessions</a>
+            @if (Model.IsActive)
+            {
+                if (!Model.HasUserVoted)
+                {
+                    <a asp-action="Vote" asp-route-id="@Model.VotingSessionId" class="btn btn-success">
+                        <i class="fas fa-vote-yea"></i> Cast Your Vote
+                    </a>
+                }
+                else
+                {
+                    <span class="badge bg-info">You have already voted</span>
+                }
+                if (Model.IsCreator)
+                {
+                    <form asp-action="End" asp-route-id="@Model.VotingSessionId" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to end this voting session?')">
+                            End Voting Session
+                        </button>
+                    </form>
+                }
+            }
+        </div>
+    </div>
+</div> 

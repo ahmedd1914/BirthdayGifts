@@ -1,0 +1,70 @@
+@model IEnumerable<VotingSessionViewModel>
+@{
+    ViewData["Title"] = "Completed Voting Sessions";
+}
+
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2>Completed Voting Sessions</h2>
+            <hr />
+        </div>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="row">
+            <div class="col">
+                @foreach (var session in Model)
+                {
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-3">
+                                    <h5 class="mb-0">@session.BirthdayPersonName</h5>
+                                    <small class="text-muted">Created by: @session.CreatorName</small><br />
+                                    <small class="text-muted">Year: @session.Year</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <p class="mb-0">Started: @session.StartedAt.ToString("MMM dd, yyyy")</p>
+                                    <small class="text-muted">
+                                        Ended: @(session.EndedAt?.ToString("MMM dd, yyyy") ?? "Not set")
+                                    </small>
+                                </div>
+                                <div class="col-md-3">
+                                    <span class="badge bg-info">
+                                        Total Votes: @session.TotalVotes
+                                    </span>
+                                </div>
+                                <div class="col-md-3 text-end">
+                                    <a href="@Url.Action("Details", "Voting", new { id = session.VotingSessionId })" class="btn btn-outline-info btn-sm me-2" title="View Details">
+                                        <i class="fas fa-info-circle"></i> Details
+                                    </a>
+                                    <a href="@Url.Action("Results", "Voting", new { id = session.VotingSessionId })" class="btn btn-outline-primary btn-sm" title="View Results">
+                                        <i class="fas fa-chart-bar"></i> Results
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            No completed voting sessions found.
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function confirmEndSession(sessionId) {
+            if (confirm('Are you sure you want to end this voting session? This action cannot be undone.')) {
+                window.location.href = '@Url.Action("EndSession")?sessionId=' + sessionId;
+            }
+        }
+    </script>
+} 

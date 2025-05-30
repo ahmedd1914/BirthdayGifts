@@ -1,0 +1,142 @@
+@model BirthdayGifts.Web.Models.ViewModels.Employee.EmployeeListViewModel
+@{
+    ViewData["Title"] = "Employees";
+    var upcomingBirthdays = Model.UpcomingBirthdays ?? new List<BirthdayGifts.Web.Models.ViewModels.Employee.EmployeeViewModel>();
+    var upcomingIds = upcomingBirthdays.Select(e => e.EmployeeId).ToHashSet();
+    var currentUserId = Context.Session.GetInt32("UserId") ?? 0;
+}
+
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2>Employees</h2>
+        </div>
+        <div class="col-md-6 text-end">
+            <a asp-action="Search" class="btn btn-info me-2" title="Search">
+                <i class="fas fa-search me-2"></i>Search
+            </a>
+            <a asp-action="UpcomingBirthdays" class="btn btn-warning me-2" title="Upcoming Birthdays">
+                <i class="fas fa-birthday-cake me-2"></i>Upcoming Birthdays
+            </a>
+            <a asp-action="Create" class="btn btn-primary" title="Add New Employee">
+                <i class="fas fa-plus me-2"></i>Add New Employee
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th></th>
+                                    <th>Name</th>
+                                    <th>Username</th>
+                                    <th>Birthday</th>
+                                    <th>Days to Birthday</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var employee in Model.Employees.Where(e => e.EmployeeId != currentUserId))
+                                {
+                                    var isUpcoming = upcomingIds.Contains(employee.EmployeeId);
+                                    <tr class="@(isUpcoming ? "table-warning" : "")">
+                                        <td>
+                                            <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width:36px;height:36px;font-weight:bold;">
+                                                @employee.FullName.Substring(0,1)
+                                            </div>
+                                        </td>
+                                        <td>
+                                            @employee.FullName
+                                            @if (isUpcoming)
+                                            {
+                                                <span class="ms-2 badge bg-warning text-dark" title="Upcoming Birthday">
+                                                    <i class="fas fa-birthday-cake"></i>
+                                                </span>
+                                            }
+                                        </td>
+                                        <td>@employee.Username</td>
+                                        <td>@employee.DateOfBirth.ToString("MMM dd, yyyy")</td>
+                                        <td>@employee.DaysToNextBirthday days</td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a asp-action="Details" asp-route-id="@employee.EmployeeId" class="btn btn-info btn-sm rounded-pill shadow-sm px-3 me-2 d-flex align-items-center gap-2" title="View Details">
+                                                    <i class="fas fa-info-circle"></i> <span>Details</span>
+                                                </a>
+                                                <a asp-action="Edit" asp-route-id="@employee.EmployeeId" class="btn btn-primary btn-sm rounded-pill shadow-sm px-3 me-2 d-flex align-items-center gap-2" title="Edit Employee">
+                                                    <i class="fas fa-edit"></i> <span>Edit</span>
+                                                </a>
+                                                @if (employee.EmployeeId != currentUserId)
+                                                {
+                                                    <form asp-controller="Voting" asp-action="Create" method="post" class="d-inline">
+                                                        <input type="hidden" name="BirthdayPersonId" value="@employee.EmployeeId" />
+                                                        <button type="submit" class="btn btn-outline-success btn-sm shadow-sm px-3" title="Start Voting">
+                                                            <i class="fas fa-vote-yea"></i> Start Voting
+                                                        </button>
+                                                    </form>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <i class="fas fa-birthday-cake me-2"></i>Upcoming Birthdays
+                </div>
+                <div class="card-body">
+                    @if (upcomingBirthdays.Any())
+                    {
+                        <div class="list-group">
+                            @foreach (var employee in upcomingBirthdays.OrderBy(e => e.DaysToNextBirthday))
+                            {
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">@employee.FullName</h6>
+                                            <p class="mb-1">
+                                                @if (employee.DaysToNextBirthday == 0)
+                                                {
+                                                    <span class="text-success">Today!</span>
+                                                }
+                                                else
+                                                {
+                                                    <small class="text-muted">In @employee.DaysToNextBirthday days</small>
+                                                }
+                                            </p>
+                                        </div>
+                                        <div>
+                                            @if (employee.EmployeeId != currentUserId)
+                                            {
+                                                <form asp-controller="Voting" asp-action="Create" method="post" class="d-inline">
+                                                    <input type="hidden" name="BirthdayPersonId" value="@employee.EmployeeId" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-primary" title="Start Voting">
+                                                        <i class="fas fa-vote-yea"></i> Start Voting
+                                                    </button>
+                                                </form>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No upcoming birthdays in the next 30 days.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

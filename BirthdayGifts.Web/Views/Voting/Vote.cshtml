@@ -1,0 +1,55 @@
+@* Views/Voting/Vote.cshtml *@
+@model BirthdayGifts.Web.Models.ViewModels.Voting.CreateVoteViewModel
+
+@{
+    ViewData["Title"] = "Cast Your Vote";
+}
+
+<div class="container">
+    <h2>@ViewData["Title"]</h2>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-8">
+            <form asp-action="Vote" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="VotingSessionId" />
+
+                <div class="form-group mb-3">
+                    <label asp-for="GiftId" class="control-label"></label>
+                    <select asp-for="GiftId" class="form-select" asp-items="@(new SelectList(Model.AvailableGifts, "GiftId", "Name"))">
+                        <option value="">-- Select a Gift --</option>
+                    </select>
+                    <span asp-validation-for="GiftId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Submit Vote</button>
+                    <a asp-action="Details" asp-route-id="@Model.VotingSessionId" class="btn btn-secondary">Back to Session</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Available Gifts</h5>
+                </div>
+                <div class="card-body">
+                    @foreach (var gift in Model.AvailableGifts)
+                    {
+                        <div class="mb-3">
+                            <h6>@gift.Name</h6>
+                            <p class="text-muted">@gift.Description</p>
+                            <p class="text-primary">@gift.Price.ToString("C")</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

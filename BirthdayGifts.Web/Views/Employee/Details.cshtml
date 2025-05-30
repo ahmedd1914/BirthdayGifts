@@ -1,0 +1,54 @@
+@model EmployeeViewModel
+@{
+    ViewData["Title"] = "Employee Details";
+}
+
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2>Employee Details</h2>
+            <hr />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h4>@Model.FullName</h4>
+                            <p class="text-muted mb-0">@Model.Username</p>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <a asp-action="Edit" asp-route-id="@Model.EmployeeId" class="btn btn-primary">
+                                <i class="fas fa-edit me-2"></i>Edit
+                            </a>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to List
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-4">Username</dt>
+                                <dd class="col-sm-8">@Model.Username</dd>
+
+                                <dt class="col-sm-4">Full Name</dt>
+                                <dd class="col-sm-8">@Model.FullName</dd>
+
+                                <dt class="col-sm-4">Date of Birth</dt>
+                                <dd class="col-sm-8">@Model.DateOfBirth.ToString("MMM dd, yyyy")</dd>
+
+                                <dt class="col-sm-4">Days to Birthday</dt>
+                                <dd class="col-sm-8">@Model.DaysToNextBirthday days</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

@@ -1,0 +1,51 @@
+@using Microsoft.AspNetCore.Mvc.ModelBinding
+@model CreateVotingSessionViewModel
+@{
+    ViewData["Title"] = "Create";
+}
+
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2>Create Voting Session</h2>
+            <hr />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger">
+                            @foreach (var error in ViewData.ModelState[""]?.Errors ?? Enumerable.Empty<ModelError>())
+                            {
+                                <p class="mb-0">@error.ErrorMessage</p>
+                            }
+                        </div>
+                    }
+
+                    <form asp-action="Create" method="post">
+                        <div class="form-group mb-3">
+                            <label asp-for="BirthdayPersonId" class="control-label"></label>
+                            <select asp-for="BirthdayPersonId" class="form-select" asp-items="@(new SelectList(ViewBag.Employees, "EmployeeId", "FullName"))">
+                                <option value="">-- Select Birthday Person --</option>
+                            </select>
+                            <span asp-validation-for="BirthdayPersonId" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Create Session</button>
+                            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,66 @@
+@* Views/Gift/Index.cshtml *@
+@model IEnumerable<GiftViewModel>
+@{
+    ViewData["Title"] = "Gifts";
+}
+
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2>Gifts</h2>
+        </div>
+        <div class="col-md-6 text-end">
+            <a asp-action="Search" class="btn btn-info me-2">
+                <i class="fas fa-search me-2"></i>Search
+            </a>
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Add New Gift
+            </a>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Price</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var gift in Model)
+                            {
+                                <tr>
+                                    <td>@gift.Name</td>
+                                    <td>@gift.Description</td>
+                                    <td>@gift.Price.ToString("C")</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a asp-action="Details" asp-route-id="@gift.GiftId" class="btn btn-sm btn-info" title="Details">
+                                                <i class="fas fa-info-circle"></i>
+                                            </a>
+                                            <a asp-action="Edit" asp-route-id="@gift.GiftId" class="btn btn-sm btn-primary" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center">No gifts available.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
